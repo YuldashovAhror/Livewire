@@ -5,19 +5,27 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use Carbon\Carbon;
 use App\Models\Comment;
+use Livewire\withPagination;
+
 class Comments extends Component
 {
-    public $allcomments;
-    
+    use WithPagination;
+
 
     public $newComment;
+    public $image;
 
-    
+    protected $listeners = [
+        'fileUpload' => 'handleFileUpload',
+    ];
 
-    // public function mount($comments)
-    // {
-    //     $this->allcomments = $comments;
-    // }
+    public function handleFileUpload($image)
+    {
+        dd($image);
+        
+        // $this->image = $file;
+    }
+
 
     public function addComment()
     {
@@ -30,16 +38,6 @@ class Comments extends Component
             'body'=> $this->newComment,
         ]);
         $this->newComment = '';
-
-        // session()->flash('message', 'Comment added successfully');
-
-        // if($this->newComment == '')
-        //  return;
-        // array_unshift($this->comments,[
-        //     'body' =>$this->newComment,
-        //     'created_at' => '1 min ago',
-        //     'creator' => 'Abror'
-        // ]);
     }
 
     public function remove($commentId)
@@ -52,8 +50,11 @@ class Comments extends Component
 
     public function render()
     {
-        $this->allcomments = Comment::all();
-        return view('livewire.comments');
+        // $this->allcomments = Comment::all();
+        return view('livewire.comments',[
+            'allcomments' => Comment::latest()->paginate(3),
+            'image' => $this->image,
+        ]);
     }
 
 }
